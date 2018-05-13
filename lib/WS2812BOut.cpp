@@ -25,7 +25,7 @@ WS2812BOut::WS2812BOut(int chainLength, int chainCount)
 	: chainLength(chainLength)
 	, chainCount(chainCount)
 	, wordSize(getWordSize(chainCount))
-	, smiout(chainLength * 24 * 3, wordSize, chainCount)
+	, smiout(chainLength * 24 * 3, wordSize, chainCount, 20) // 50 MHz / 20 = 2.5 MHz (400 ns cycle length)
 {
 }
 

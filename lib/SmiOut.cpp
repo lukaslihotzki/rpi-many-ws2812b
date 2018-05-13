@@ -3,10 +3,17 @@
 #include <iostream>
 #include <unistd.h>
 
-SmiOut::SmiOut(int wordCount, int wordSize, int bitCount)
+template <typename T>
+static inline T clamp(const T& v, const T& lo, const T& hi)
+{
+	return (v < lo) ? lo : (hi < v) ? hi : v;
+}
+
+SmiOut::SmiOut(int wordCount, int wordSize, int bitCount, int divisor)
 	: wordCount(wordCount)
 	, wordSize(wordSize)
 	, bitCount(bitCount)
+	, divisor(divisor)
 	, mymem(mbox, mem, model, (sizeof(mymem_t) + wordCount * wordSize + 0xfff) &~ 0xfff, 0x1000)
 	, dmachan(dma[5])
 {
@@ -20,9 +27,10 @@ SmiOut::SmiOut(int wordCount, int wordSize, int bitCount)
 	// 6 = PLLD 500 MHz clocksource;  500 MHz / 10 = 50 MHz
 	clocks->smi.setup(6, 10);
 
-	// 1 (hold) + 1 (pace) + 18 (strobe) = 20, 50 MHz / 20 = 2.5 MHz
-	unsigned timing = (1 << smi_ctl::setup) | (1 << smi_ctl::hold) |
-	                  (1 << smi_ctl::pace) | (18 << smi_ctl::strobe);
+	unsigned timing = (1 << smi_ctl::pace)
+		| (clamp(divisor - 190, 1, 63) << smi_ctl::hold)
+		| (clamp(divisor - 128, 1, 63) << smi_ctl::setup)
+		| (clamp(divisor - 2, 1, 127) << smi_ctl::strobe);
 
 	switch (wordSize) {
 		case 1:
@@ -89,14 +97,15 @@ void SmiOut::operator()(unsigned offset, unsigned len)
 #ifdef DBG_WAIT
 	usleep(10);
 #else
-	usleep(len / 5 * 2 - 100); // len * 0.4 = len / 5 * 2
+	int sleepTime = len * divisor / 50;
+	usleep(sleepTime < 10 ? 10 : sleepTime);
 #endif
 
 	while (!(smi->cs & smi_ctl::cs_done) && (dmachan.cs & dma_chan::cs_active)) {
 		sched_yield();
 	}
 
-	usleep(10);
+	usleep(divisor * 2);
 
 	if (!(smi->cs & smi_ctl::cs_done)) {
 		std::cerr << "SMI not finished." << std::endl;
