@@ -73,7 +73,7 @@ void SmiOut::operator()(unsigned offset, unsigned len)
 	mymem->cb.info = dma_cb::wait_resp | dma_cb::dest_dreq | dma_cb::dreq_smi | dma_cb::src_inc;
 	mymem->cb.src = mymem.to_physical(mymem->data + wordSize * offset);
 	mymem->cb.dst = smi.to_physical(&smi->data);
-	mymem->cb.length = wordCount * wordSize;
+	mymem->cb.length = wordSize * len;
 	mymem->cb.stride = 0;
 	mymem->cb.next = 0;
 
