@@ -28,7 +28,8 @@ enum BoardRevisionType {
 	alpha = 5,
 	cm = 6,
 	pi3_b = 8,
-	cm3 = 10
+	cm3 = 10,
+	pi3_b_plus = 13
 };
 
 Model::Model(Mailbox& mailbox)
@@ -42,7 +43,7 @@ bool Model::isNew(unsigned revision)
 {
 	if (revision & board_revision_new_scheme) {
 		BoardRevisionType type = BoardRevisionType((revision & board_revision_type_mask) >> board_revision_type_offs);
-		return type == pi2_b || type == pi3_b || type == cm3;
+		return type == pi2_b || type == pi3_b || type == cm3 || type == pi3_b_plus;
 	} else {
 		return false;
 	}
