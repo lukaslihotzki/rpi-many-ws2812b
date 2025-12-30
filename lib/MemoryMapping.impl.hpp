@@ -2,6 +2,8 @@
 
 #include "MemoryFile.hpp"
 
+#include <stdexcept>
+#include <cstdint>
 #include <sys/mman.h>
 
 template<typename T>
@@ -37,7 +39,7 @@ MemoryMapping<T>::operator T*()
 template<typename T>
 unsigned MemoryMapping<T>::to_virtual(void* data)
 {
-	return reinterpret_cast<uint8_t*>(data) - reinterpret_cast<uint8_t*>(this->ptr) + virt_base;
+	return reinterpret_cast<std::uint8_t*>(data) - reinterpret_cast<std::uint8_t*>(this->ptr) + virt_base;
 }
 
 template<typename T>

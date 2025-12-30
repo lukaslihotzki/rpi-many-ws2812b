@@ -2,8 +2,9 @@
 #define COLOR_HPP
 
 #include <array>
+#include <cstdint>
 
-typedef std::array<uint8_t, 3> Color;
+typedef std::array<std::uint8_t, 3> Color;
 
 static_assert(sizeof(Color) == 3);
 

@@ -6,6 +6,7 @@
 #include <vector>
 #include <algorithm>
 #include <numeric>
+#include <functional>
 
 int main(int argc, char** argv)
 {
@@ -45,7 +46,7 @@ int main(int argc, char** argv)
 	WS2812BOut out(maxLength, chainLengths.size());
 
 	while (running) {
-		std::for_each(pps.begin(), pps.end(), std::mem_fun_ref(&PingPongStrip::step));
+		std::for_each(pps.begin(), pps.end(), std::mem_fn(&PingPongStrip::step));
 		out(row.data());
 	}
 }

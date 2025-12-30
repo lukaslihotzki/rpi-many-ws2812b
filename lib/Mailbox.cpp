@@ -3,6 +3,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/ioctl.h>
+#include <stdexcept>
 
 Mailbox::Mailbox()
 	: fd(open("/dev/vcio", O_RDWR))
